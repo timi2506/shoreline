@@ -1,1 +1,80 @@
-Status page here Soon™ 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proxmox VM Status</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        table {
+            width: 80%;
+            margin: 20px auto;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 10px;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        .status-running {
+            color: green;
+        }
+        .status-stopped {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <h1>Proxmox VM Status</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>VM ID</th>
+                <th>Name</th>
+                <th>Node</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody id="vm-table">
+            <tr><td colspan="4">Loading...</td></tr>
+        </tbody>
+    </table>
+
+    <script>
+        const CLOUDFLARE_WORKER_URL = "https://proxmox.keirangriffiths33.workers.dev";  // Replace with your Worker URL
+
+        async function fetchVMStatus() {
+            try {
+                const response = await fetch(CLOUDFLARE_WORKER_URL);
+                if (!response.ok) throw new Error("Failed to fetch data");
+                const data = await response.json();
+
+                const tableBody = document.getElementById('vm-table');
+                tableBody.innerHTML = '';
+
+                data.forEach(vm => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${vm.vmid}</td>
+                        <td>${vm.name}</td>
+                        <td>${vm.node}</td>
+                        <td class="status-${vm.status}">${vm.status}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            } catch (error) {
+                document.getElementById('vm-table').innerHTML = `<tr><td colspan="4">Error fetching data</td></tr>`;
+                console.error(error);
+            }
+        }
+
+        fetchVMStatus();
+        setInterval(fetchVMStatus, 10000); // Refresh every 10 seconds
+    </script>
+</body>
+</html>
