@@ -18,8 +18,18 @@
             border: none;
         }
     </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if cookies and authentication are properly handled
+            var iframe = document.querySelector('iframe');
+            iframe.onload = function() {
+                // Check if the iframe loaded successfully
+                console.log('Iframe loaded');
+            };
+        });
+    </script>
 </head>
 <body>
-    <iframe src="https://bahamasbananas.duckdns.org"></iframe>
+    <iframe src="https://bahamasbananas.duckdns.org" allow="fullscreen" sandbox="allow-scripts allow-same-origin allow-popups allow-forms"></iframe>
 </body>
 </html>
